@@ -1,22 +1,20 @@
-using Microsoft.AspNetCore.Http;
+using Infrastructure.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using Web.DTOs.Hotels;
 
 namespace Web.Controllers
 {
     [Route("api/hotels")]
     [ApiController]
-    public class HotelsController : ControllerBase
+    public class HotelsController(IHotelService hotelService) : ControllerBase
     {
         [HttpGet]
-        public async Task<IActionResult> Search([FromQuery] string name)
+        public async Task<IActionResult> Search([FromQuery] string? name = null)
         {
-            return Ok();
-        }
-
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> Get(int id)
-        {
-            return Ok();
+            var hotels = await hotelService.Search(name);
+            var dtos = hotels.Select(x => new HotelDto { Id = x.Id, Name = x.Name });
+            
+            return Ok(dtos);
         }
     }
 }

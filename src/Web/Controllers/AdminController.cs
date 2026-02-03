@@ -1,21 +1,25 @@
-using Microsoft.AspNetCore.Http;
+using Infrastructure.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/admin")]
     [ApiController]
-    public class AdminController : ControllerBase
+    public class AdminController(IAdminService adminService) : ControllerBase
     {
-        [HttpPost]
-        public async Task<IActionResult> Seed()
+        [HttpPost("seed")]
+        public async Task<IActionResult> Seed(CancellationToken cancellationToken)
         {
+            await adminService.Seed(cancellationToken);
+            
             return NoContent();
         }
         
-        [HttpPost]
-        public async Task<IActionResult> Reset()
+        [HttpPost("reset")]
+        public async Task<IActionResult> Reset(CancellationToken cancellationToken)
         {
+            await adminService.Reset(cancellationToken);
+            
             return NoContent();
         }
     }
