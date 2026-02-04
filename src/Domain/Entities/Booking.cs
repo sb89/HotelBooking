@@ -10,6 +10,4 @@ public class Booking
     
     public int HotelRoomId { get; set; }
     public HotelRoom? Room { get; set; }
-    
-    public ICollection<Booking> Bookings { get; set; } = [];
 }

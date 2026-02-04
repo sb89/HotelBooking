@@ -5,5 +5,5 @@ namespace Infrastructure.Interfaces.Services;
 
 public interface IHotelRoomsService
 {
-    Task<SearchAvailableResult> SearchAvailable(SearchAvailableCriteria criteria);
+    Task<SearchAvailableResult> SearchAvailable(SearchAvailableCriteria criteria, CancellationToken cancellationToken = default);
 }

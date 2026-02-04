@@ -41,7 +41,21 @@ namespace Web.Controllers
         [HttpGet("{bookingReference:int}")]
         public async Task<IActionResult> Get(int bookingReference)
         {
-            return Ok();
+            var booking = await bookingsService.Get(bookingReference);
+            if (booking == null)
+            {
+                return this.NotFoundProblem("Booking Not Found", "The specified booking does not exist");
+            }
+
+            return Ok(new GetBookingResult
+            {
+                BookingReference =  bookingReference,
+                CheckInDate = booking.StartDate,
+                CheckOutDate = booking.EndDate.AddDays(+1),
+                NumberOfGuests = booking.NoOfGuests,
+                HotelName = booking.Room!.Hotel!.Name,
+                RoomNumber = booking.Room!.RoomNumber
+            });
         }
     }
 }

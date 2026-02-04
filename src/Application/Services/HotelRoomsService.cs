@@ -8,9 +8,9 @@ namespace Infrastructure.Services;
 
 public class HotelRoomsService(ApplicationDbContext dbContext) : IHotelRoomsService
 {
-    public async Task<SearchAvailableResult> SearchAvailable(SearchAvailableCriteria criteria)
+    public async Task<SearchAvailableResult> SearchAvailable(SearchAvailableCriteria criteria, CancellationToken cancellationToken = default)
     {
-        var hotel = await dbContext.Hotels.FindAsync(criteria.HotelId);
+        var hotel = await dbContext.Hotels.FindAsync([criteria.HotelId], cancellationToken);
         if (hotel == null)
         {
             return new SearchAvailableResult.HotelNotFound();
@@ -20,7 +20,7 @@ public class HotelRoomsService(ApplicationDbContext dbContext) : IHotelRoomsServ
             .Where(r => r.HotelId == criteria.HotelId)
             .Where(r => !r.Bookings.Any(b =>
                 b.StartDate <= criteria.EndDate && b.EndDate >= criteria.StartDate))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
         
         var totalCapacity = availableRooms.Sum(r => r.Capacity);
 

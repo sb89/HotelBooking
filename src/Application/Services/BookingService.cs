@@ -62,4 +62,12 @@ public class BookingService(ApplicationDbContext dbContext) : IBookingsService
             roomLock.Release();
         }
     }
+
+    public Task<Booking?> Get(int bookingReference, CancellationToken cancellationToken = default)
+    {
+        return dbContext.Bookings
+            .Include(x => x.Room)
+            .ThenInclude(x => x!.Hotel)
+            .FirstOrDefaultAsync(x => x.Id == bookingReference, cancellationToken);
+    }
 }

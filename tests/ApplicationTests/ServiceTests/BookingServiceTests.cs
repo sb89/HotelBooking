@@ -371,4 +371,161 @@ public class BookingServiceTests
         // Assert
         Assert.IsType<CreateBookingResult.Success>(result);
     }
+
+    [Fact]
+    public async Task Get_BookingExists_ReturnsBooking()
+    {
+        // Arrange
+        await using var dbContext = DbContextFactory.Create();
+        var hotel = new Hotel { Name = "Test Hotel" };
+        var room = new HotelRoom { RoomNumber = 101, RoomType = HotelRoomType.Double, Capacity = 2 };
+        hotel.Rooms.Add(room);
+
+        var booking = new Booking
+        {
+            StartDate = new DateOnly(2025, 1, 10),
+            EndDate = new DateOnly(2025, 1, 12),
+            NoOfGuests = 2
+        };
+        room.Bookings.Add(booking);
+
+        dbContext.Hotels.Add(hotel);
+        await dbContext.SaveChangesAsync();
+
+        var service = new BookingService(dbContext);
+
+        // Act
+        var result = await service.Get(booking.Id);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(booking.Id, result.Id);
+        Assert.Equal(new DateOnly(2025, 1, 10), result.StartDate);
+        Assert.Equal(new DateOnly(2025, 1, 12), result.EndDate);
+        Assert.Equal(2, result.NoOfGuests);
+        Assert.Equal(room.Id, result.HotelRoomId);
+    }
+
+    [Fact]
+    public async Task Get_BookingNotFound_ReturnsNull()
+    {
+        // Arrange
+        await using var dbContext = DbContextFactory.Create();
+        var service = new BookingService(dbContext);
+
+        // Act
+        var result = await service.Get(999);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task Get_IncludesRoomDetails()
+    {
+        // Arrange
+        await using var dbContext = DbContextFactory.Create();
+        var hotel = new Hotel { Name = "Test Hotel" };
+        var room = new HotelRoom { RoomNumber = 101, RoomType = HotelRoomType.Double, Capacity = 2 };
+        hotel.Rooms.Add(room);
+
+        var booking = new Booking
+        {
+            StartDate = new DateOnly(2025, 1, 10),
+            EndDate = new DateOnly(2025, 1, 12),
+            NoOfGuests = 2
+        };
+        room.Bookings.Add(booking);
+
+        dbContext.Hotels.Add(hotel);
+        await dbContext.SaveChangesAsync();
+
+        var service = new BookingService(dbContext);
+
+        // Act
+        var result = await service.Get(booking.Id);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.NotNull(result.Room);
+        Assert.Equal(101, result.Room.RoomNumber);
+        Assert.Equal(HotelRoomType.Double, result.Room.RoomType);
+        Assert.Equal(2, result.Room.Capacity);
+    }
+
+    [Fact]
+    public async Task Get_IncludesHotelDetails()
+    {
+        // Arrange
+        await using var dbContext = DbContextFactory.Create();
+        var hotel = new Hotel { Name = "Grand Hotel" };
+        var room = new HotelRoom { RoomNumber = 101, RoomType = HotelRoomType.Double, Capacity = 2 };
+        hotel.Rooms.Add(room);
+
+        var booking = new Booking
+        {
+            StartDate = new DateOnly(2025, 1, 10),
+            EndDate = new DateOnly(2025, 1, 12),
+            NoOfGuests = 2
+        };
+        room.Bookings.Add(booking);
+
+        dbContext.Hotels.Add(hotel);
+        await dbContext.SaveChangesAsync();
+
+        var service = new BookingService(dbContext);
+
+        // Act
+        var result = await service.Get(booking.Id);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.NotNull(result.Room);
+        Assert.NotNull(result.Room.Hotel);
+        Assert.Equal("Grand Hotel", result.Room.Hotel.Name);
+    }
+
+    [Fact]
+    public async Task Get_MultipleBookings_ReturnsCorrectOne()
+    {
+        // Arrange
+        await using var dbContext = DbContextFactory.Create();
+        var hotel = new Hotel { Name = "Test Hotel" };
+        var room1 = new HotelRoom { RoomNumber = 101, RoomType = HotelRoomType.Single, Capacity = 1 };
+        var room2 = new HotelRoom { RoomNumber = 102, RoomType = HotelRoomType.Double, Capacity = 2 };
+        hotel.Rooms.Add(room1);
+        hotel.Rooms.Add(room2);
+
+        var booking1 = new Booking
+        {
+            StartDate = new DateOnly(2025, 1, 10),
+            EndDate = new DateOnly(2025, 1, 12),
+            NoOfGuests = 1
+        };
+        room1.Bookings.Add(booking1);
+
+        var booking2 = new Booking
+        {
+            StartDate = new DateOnly(2025, 1, 15),
+            EndDate = new DateOnly(2025, 1, 17),
+            NoOfGuests = 2
+        };
+        room2.Bookings.Add(booking2);
+
+        dbContext.Hotels.Add(hotel);
+        await dbContext.SaveChangesAsync();
+
+        var service = new BookingService(dbContext);
+
+        // Act
+        var result = await service.Get(booking2.Id);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(booking2.Id, result.Id);
+        Assert.Equal(new DateOnly(2025, 1, 15), result.StartDate);
+        Assert.Equal(new DateOnly(2025, 1, 17), result.EndDate);
+        Assert.Equal(2, result.NoOfGuests);
+        Assert.Equal(102, result.Room!.RoomNumber);
+    }
 }
