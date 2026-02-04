@@ -18,7 +18,7 @@ namespace Web.Controllers
             if (!validationResult.IsValid)
                 return validationResult.ToValidationProblem(this);
             
-            var result = await bookingsService.CreateBooking(request.CheckInDate, request.CheckOutDate.AddDays(-1), 
+            var result = await bookingsService.CreateBooking(request.CheckInDate, request.CheckOutDate, 
                 request.RoomId, request.NumberOfGuests);
             
             return result.Match<IActionResult>(
@@ -50,8 +50,8 @@ namespace Web.Controllers
             return Ok(new GetBookingResult
             {
                 BookingReference =  bookingReference,
-                CheckInDate = booking.StartDate,
-                CheckOutDate = booking.EndDate.AddDays(+1),
+                CheckInDate = booking.CheckInDate,
+                CheckOutDate = booking.CheckOutDate,
                 NumberOfGuests = booking.NoOfGuests,
                 HotelName = booking.Room!.Hotel!.Name,
                 RoomNumber = booking.Room!.RoomNumber

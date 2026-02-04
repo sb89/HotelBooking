@@ -11,7 +11,7 @@ public class BookingService(ApplicationDbContext dbContext) : IBookingsService
 {
     private static readonly ConcurrentDictionary<int, SemaphoreSlim> CreateBookingLock = new();
 
-    public async Task<CreateBookingResult> CreateBooking(DateOnly startDate, DateOnly endDate, int roomId, 
+    public async Task<CreateBookingResult> CreateBooking(DateOnly checkInDate, DateOnly checkOutDate, int roomId, 
         int numberOfGuests, CancellationToken cancellationToken = default)
     {
         var room = await dbContext.HotelRooms.FindAsync([roomId], cancellationToken);
@@ -36,8 +36,8 @@ public class BookingService(ApplicationDbContext dbContext) : IBookingsService
             var hasOverlap = await dbContext.Bookings
                 .AnyAsync(b =>
                     b.HotelRoomId == roomId &&
-                    b.StartDate <= endDate &&
-                    b.EndDate >= startDate,
+                    b.CheckInDate < checkOutDate &&
+                    b.CheckOutDate > checkInDate,
                     cancellationToken);
 
             if (hasOverlap)
@@ -46,8 +46,8 @@ public class BookingService(ApplicationDbContext dbContext) : IBookingsService
             var booking = new Booking
             {
                 HotelRoomId = roomId,
-                StartDate = startDate,
-                EndDate = endDate,
+                CheckInDate = checkInDate,
+                CheckOutDate = checkOutDate,
                 NoOfGuests =  numberOfGuests
             };
             

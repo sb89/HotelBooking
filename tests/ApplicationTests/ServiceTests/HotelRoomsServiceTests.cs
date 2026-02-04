@@ -17,8 +17,8 @@ public class HotelRoomsServiceTests
         var criteria = new SearchAvailableCriteria
         {
             HotelId = 999,
-            StartDate = new DateOnly(2025, 1, 10),
-            EndDate = new DateOnly(2025, 1, 12),
+            CheckInDate = new DateOnly(2025, 1, 10),
+            CheckoutDate = new DateOnly(2025, 1, 12),
             NumberOfGuests = 1
         };
 
@@ -47,8 +47,8 @@ public class HotelRoomsServiceTests
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
-            StartDate = new DateOnly(2025, 1, 10),
-            EndDate = new DateOnly(2025, 1, 12),
+            CheckInDate = new DateOnly(2025, 1, 10),
+            CheckoutDate = new DateOnly(2025, 1, 12),
             NumberOfGuests = 1
         };
 
@@ -69,8 +69,8 @@ public class HotelRoomsServiceTests
         var room = new HotelRoom { RoomNumber = 1, RoomType = HotelRoomType.Single, Capacity = 1 };
         room.Bookings.Add(new Booking
         {
-            StartDate = new DateOnly(2025, 1, 5),
-            EndDate = new DateOnly(2025, 1, 9),
+            CheckInDate = new DateOnly(2025, 1, 5),
+            CheckOutDate = new DateOnly(2025, 1, 9),
             NoOfGuests = 1
         });
         hotel.Rooms.Add(room);
@@ -81,8 +81,8 @@ public class HotelRoomsServiceTests
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
-            StartDate = new DateOnly(2025, 1, 10),
-            EndDate = new DateOnly(2025, 1, 12),
+            CheckInDate = new DateOnly(2025, 1, 10),
+            CheckoutDate = new DateOnly(2025, 1, 12),
             NumberOfGuests = 1
         };
 
@@ -103,8 +103,8 @@ public class HotelRoomsServiceTests
         var room = new HotelRoom { RoomNumber = 1, RoomType = HotelRoomType.Single, Capacity = 1 };
         room.Bookings.Add(new Booking
         {
-            StartDate = new DateOnly(2025, 1, 10),
-            EndDate = new DateOnly(2025, 1, 15),
+            CheckInDate = new DateOnly(2025, 1, 10),
+            CheckOutDate = new DateOnly(2025, 1, 15),
             NoOfGuests = 1
         });
         hotel.Rooms.Add(room);
@@ -115,8 +115,8 @@ public class HotelRoomsServiceTests
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
-            StartDate = new DateOnly(2025, 1, 11),
-            EndDate = new DateOnly(2025, 1, 13),
+            CheckInDate = new DateOnly(2025, 1, 11),
+            CheckoutDate = new DateOnly(2025, 1, 13),
             NumberOfGuests = 1
         };
 
@@ -129,17 +129,17 @@ public class HotelRoomsServiceTests
     }
 
     [Fact]
-    public async Task SearchAvailable_BookingStartsOnSearchEndDate_DoesNotReturnRoom()
+    public async Task SearchAvailable_BookingStartsOnSearchEndDate_ReturnsRoom()
     {
-        // Existing booking starts on the last night of the search period
+        // Existing booking starts on search checkout date (no overlap)
         // Arrange
         await using var dbContext = DbContextFactory.Create();
         var hotel = new Hotel { Name = "Test Hotel" };
         var room = new HotelRoom { RoomNumber = 1, RoomType = HotelRoomType.Single, Capacity = 1 };
         room.Bookings.Add(new Booking
         {
-            StartDate = new DateOnly(2025, 1, 12), // Starts on search end date
-            EndDate = new DateOnly(2025, 1, 15),
+            CheckInDate = new DateOnly(2025, 1, 12), // Starts on search end date
+            CheckOutDate = new DateOnly(2025, 1, 15),
             NoOfGuests = 1
         });
         hotel.Rooms.Add(room);
@@ -150,8 +150,8 @@ public class HotelRoomsServiceTests
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
-            StartDate = new DateOnly(2025, 1, 10),
-            EndDate = new DateOnly(2025, 1, 12), // Last night is Jan 12
+            CheckInDate = new DateOnly(2025, 1, 10),
+            CheckoutDate = new DateOnly(2025, 1, 12), // Leaves Jan 12
             NumberOfGuests = 1
         };
 
@@ -160,21 +160,21 @@ public class HotelRoomsServiceTests
 
         // Assert
         var success = Assert.IsType<SearchAvailableResult.Success>(result);
-        Assert.Empty(success.HotelRooms); // Should NOT be available - both want Jan 12
+        Assert.Single(success.HotelRooms); // Should be available - no overlap
     }
 
     [Fact]
-    public async Task SearchAvailable_BookingEndsOnSearchStartDate_DoesNotReturnRoom()
+    public async Task SearchAvailable_BookingEndsOnSearchStartDate_ReturnsRoom()
     {
-        // Existing booking ends on the first night of the search period
+        // Existing booking checkout matches search checkin (no overlap)
         // Arrange
         await using var dbContext = DbContextFactory.Create();
         var hotel = new Hotel { Name = "Test Hotel" };
         var room = new HotelRoom { RoomNumber = 1, RoomType = HotelRoomType.Single, Capacity = 1 };
         room.Bookings.Add(new Booking
         {
-            StartDate = new DateOnly(2025, 1, 8),
-            EndDate = new DateOnly(2025, 1, 10), // Last night is Jan 10
+            CheckInDate = new DateOnly(2025, 1, 8),
+            CheckOutDate = new DateOnly(2025, 1, 10), // Leaves Jan 10
             NoOfGuests = 1
         });
         hotel.Rooms.Add(room);
@@ -185,8 +185,8 @@ public class HotelRoomsServiceTests
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
-            StartDate = new DateOnly(2025, 1, 10), // First night is Jan 10
-            EndDate = new DateOnly(2025, 1, 12),
+            CheckInDate = new DateOnly(2025, 1, 10), // Arrives Jan 10
+            CheckoutDate = new DateOnly(2025, 1, 12),
             NumberOfGuests = 1
         };
 
@@ -195,21 +195,21 @@ public class HotelRoomsServiceTests
 
         // Assert
         var success = Assert.IsType<SearchAvailableResult.Success>(result);
-        Assert.Empty(success.HotelRooms); // Should NOT be available - both want Jan 10
+        Assert.Single(success.HotelRooms); // Should be available - no overlap
     }
 
     [Fact]
     public async Task SearchAvailable_BackToBackBookings_ReturnsRoom()
     {
-        // Guest A checks out Jan 10 (EndDate=9), Guest B checks in Jan 10 (StartDate=10)
+        // Guest A leaves Jan 9, Guest B arrives Jan 10 (no overlap)
         // Arrange
         await using var dbContext = DbContextFactory.Create();
         var hotel = new Hotel { Name = "Test Hotel" };
         var room = new HotelRoom { RoomNumber = 1, RoomType = HotelRoomType.Single, Capacity = 1 };
         room.Bookings.Add(new Booking
         {
-            StartDate = new DateOnly(2025, 1, 5),
-            EndDate = new DateOnly(2025, 1, 9), // Last night Jan 9, checkout morning of Jan 10
+            CheckInDate = new DateOnly(2025, 1, 5),
+            CheckOutDate = new DateOnly(2025, 1, 9), // Leaves Jan 9
             NoOfGuests = 1
         });
         hotel.Rooms.Add(room);
@@ -220,8 +220,8 @@ public class HotelRoomsServiceTests
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
-            StartDate = new DateOnly(2025, 1, 10), // Check in Jan 10
-            EndDate = new DateOnly(2025, 1, 12),
+            CheckInDate = new DateOnly(2025, 1, 10), // Arrives Jan 10
+            CheckoutDate = new DateOnly(2025, 1, 12),
             NumberOfGuests = 1
         };
 
@@ -251,8 +251,8 @@ public class HotelRoomsServiceTests
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
-            StartDate = new DateOnly(2025, 1, 10),
-            EndDate = new DateOnly(2025, 1, 12),
+            CheckInDate = new DateOnly(2025, 1, 10),
+            CheckoutDate = new DateOnly(2025, 1, 12),
             NumberOfGuests = 5 // More than total capacity (2)
         };
 
@@ -282,8 +282,8 @@ public class HotelRoomsServiceTests
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel1.Id,
-            StartDate = new DateOnly(2025, 1, 10),
-            EndDate = new DateOnly(2025, 1, 12),
+            CheckInDate = new DateOnly(2025, 1, 10),
+            CheckoutDate = new DateOnly(2025, 1, 12),
             NumberOfGuests = 1
         };
 
@@ -306,8 +306,8 @@ public class HotelRoomsServiceTests
         var room = new HotelRoom { RoomNumber = 1, RoomType = HotelRoomType.Single, Capacity = 1 };
         room.Bookings.Add(new Booking
         {
-            StartDate = new DateOnly(2025, 1, 8),
-            EndDate = new DateOnly(2025, 1, 11),
+            CheckInDate = new DateOnly(2025, 1, 8),
+            CheckOutDate = new DateOnly(2025, 1, 11),
             NoOfGuests = 1
         });
         hotel.Rooms.Add(room);
@@ -318,8 +318,8 @@ public class HotelRoomsServiceTests
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
-            StartDate = new DateOnly(2025, 1, 10),
-            EndDate = new DateOnly(2025, 1, 14),
+            CheckInDate = new DateOnly(2025, 1, 10),
+            CheckoutDate = new DateOnly(2025, 1, 14),
             NumberOfGuests = 1
         };
 
@@ -341,8 +341,8 @@ public class HotelRoomsServiceTests
         var room = new HotelRoom { RoomNumber = 1, RoomType = HotelRoomType.Single, Capacity = 1 };
         room.Bookings.Add(new Booking
         {
-            StartDate = new DateOnly(2025, 1, 13),
-            EndDate = new DateOnly(2025, 1, 17),
+            CheckInDate = new DateOnly(2025, 1, 13),
+            CheckOutDate = new DateOnly(2025, 1, 17),
             NoOfGuests = 1
         });
         hotel.Rooms.Add(room);
@@ -353,8 +353,8 @@ public class HotelRoomsServiceTests
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
-            StartDate = new DateOnly(2025, 1, 10),
-            EndDate = new DateOnly(2025, 1, 14),
+            CheckInDate = new DateOnly(2025, 1, 10),
+            CheckoutDate = new DateOnly(2025, 1, 14),
             NumberOfGuests = 1
         };
 

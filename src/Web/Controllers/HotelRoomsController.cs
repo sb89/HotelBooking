@@ -22,8 +22,8 @@ namespace Web.Controllers
             var criteria = new SearchAvailableCriteria
             {
                 HotelId =  hotelId,
-                StartDate =  request.CheckInDate,
-                EndDate =  request.CheckOutDate.AddDays(-1),
+                CheckInDate =  request.CheckInDate,
+                CheckoutDate =  request.CheckOutDate,
                 NumberOfGuests = request.NumberOfGuests
             };
             

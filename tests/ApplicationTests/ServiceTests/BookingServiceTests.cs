@@ -16,8 +16,8 @@ public class BookingServiceTests
 
         // Act
         var result = await service.CreateBooking(
-            startDate: new DateOnly(2025, 1, 10),
-            endDate: new DateOnly(2025, 1, 12),
+            checkInDate: new DateOnly(2025, 1, 10),
+            checkOutDate: new DateOnly(2025, 1, 12),
             roomId: 999,
             numberOfGuests: 1);
 
@@ -40,8 +40,8 @@ public class BookingServiceTests
 
         // Act
         var result = await service.CreateBooking(
-            startDate: new DateOnly(2025, 1, 10),
-            endDate: new DateOnly(2025, 1, 12),
+            checkInDate: new DateOnly(2025, 1, 10),
+            checkOutDate: new DateOnly(2025, 1, 12),
             roomId: room.Id,
             numberOfGuests: 5); // Exceeds capacity of 1
 
@@ -64,8 +64,8 @@ public class BookingServiceTests
 
         // Act
         var result = await service.CreateBooking(
-            startDate: new DateOnly(2025, 1, 10),
-            endDate: new DateOnly(2025, 1, 12),
+            checkInDate: new DateOnly(2025, 1, 10),
+            checkOutDate: new DateOnly(2025, 1, 12),
             roomId: room.Id,
             numberOfGuests: 2);
 
@@ -83,8 +83,8 @@ public class BookingServiceTests
         var room = new HotelRoom { RoomNumber = 1, RoomType = HotelRoomType.Single, Capacity = 1 };
         room.Bookings.Add(new Booking
         {
-            StartDate = new DateOnly(2025, 1, 5),
-            EndDate = new DateOnly(2025, 1, 9),
+            CheckInDate = new DateOnly(2025, 1, 5),
+            CheckOutDate = new DateOnly(2025, 1, 9),
             NoOfGuests = 1
         });
         hotel.Rooms.Add(room);
@@ -95,8 +95,8 @@ public class BookingServiceTests
 
         // Act
         var result = await service.CreateBooking(
-            startDate: new DateOnly(2025, 1, 10),
-            endDate: new DateOnly(2025, 1, 12),
+            checkInDate: new DateOnly(2025, 1, 10),
+            checkOutDate: new DateOnly(2025, 1, 12),
             roomId: room.Id,
             numberOfGuests: 1);
 
@@ -113,8 +113,8 @@ public class BookingServiceTests
         var room = new HotelRoom { RoomNumber = 1, RoomType = HotelRoomType.Single, Capacity = 1 };
         room.Bookings.Add(new Booking
         {
-            StartDate = new DateOnly(2025, 1, 10),
-            EndDate = new DateOnly(2025, 1, 15),
+            CheckInDate = new DateOnly(2025, 1, 10),
+            CheckOutDate = new DateOnly(2025, 1, 15),
             NoOfGuests = 1
         });
         hotel.Rooms.Add(room);
@@ -125,8 +125,8 @@ public class BookingServiceTests
 
         // Act
         var result = await service.CreateBooking(
-            startDate: new DateOnly(2025, 1, 11),
-            endDate: new DateOnly(2025, 1, 13),
+            checkInDate: new DateOnly(2025, 1, 11),
+            checkOutDate: new DateOnly(2025, 1, 13),
             roomId: room.Id,
             numberOfGuests: 1);
 
@@ -135,17 +135,17 @@ public class BookingServiceTests
     }
 
     [Fact]
-    public async Task CreateBooking_ExistingBookingStartsOnNewEndDate_ReturnsRoomNoLongerAvailable()
+    public async Task CreateBooking_ExistingBookingStartsOnNewEndDate_ReturnsSuccess()
     {
-        // Existing booking starts on the last night of new booking
+        // Existing booking starts on new booking's checkout date (no overlap)
         // Arrange
         await using var dbContext = DbContextFactory.Create();
         var hotel = new Hotel { Name = "Test Hotel" };
         var room = new HotelRoom { RoomNumber = 1, RoomType = HotelRoomType.Single, Capacity = 1 };
         room.Bookings.Add(new Booking
         {
-            StartDate = new DateOnly(2025, 1, 12), // Starts on new booking's end date
-            EndDate = new DateOnly(2025, 1, 15),
+            CheckInDate = new DateOnly(2025, 1, 12), // CheckIn on new booking's checkout date
+            CheckOutDate = new DateOnly(2025, 1, 15),
             NoOfGuests = 1
         });
         hotel.Rooms.Add(room);
@@ -156,27 +156,27 @@ public class BookingServiceTests
 
         // Act
         var result = await service.CreateBooking(
-            startDate: new DateOnly(2025, 1, 10),
-            endDate: new DateOnly(2025, 1, 12), // Last night is Jan 12
+            checkInDate: new DateOnly(2025, 1, 10),
+            checkOutDate: new DateOnly(2025, 1, 12), // Leaves Jan 12
             roomId: room.Id,
             numberOfGuests: 1);
 
         // Assert
-        Assert.IsType<CreateBookingResult.RoomNoLongerAvailable>(result);
+        Assert.IsType<CreateBookingResult.Success>(result);
     }
 
     [Fact]
-    public async Task CreateBooking_ExistingBookingEndsOnNewStartDate_ReturnsRoomNoLongerAvailable()
+    public async Task CreateBooking_ExistingBookingEndsOnNewStartDate_ReturnsSuccess()
     {
-        // Existing booking ends on the first night of new booking
+        // Existing booking's checkout date matches new booking's checkin (no overlap)
         // Arrange
         await using var dbContext = DbContextFactory.Create();
         var hotel = new Hotel { Name = "Test Hotel" };
         var room = new HotelRoom { RoomNumber = 1, RoomType = HotelRoomType.Single, Capacity = 1 };
         room.Bookings.Add(new Booking
         {
-            StartDate = new DateOnly(2025, 1, 8),
-            EndDate = new DateOnly(2025, 1, 10), // Last night is Jan 10
+            CheckInDate = new DateOnly(2025, 1, 8),
+            CheckOutDate = new DateOnly(2025, 1, 10), // Staying nights Jan 8, 9 (leave morning of 10th)
             NoOfGuests = 1
         });
         hotel.Rooms.Add(room);
@@ -187,27 +187,27 @@ public class BookingServiceTests
 
         // Act
         var result = await service.CreateBooking(
-            startDate: new DateOnly(2025, 1, 10), // First night is Jan 10
-            endDate: new DateOnly(2025, 1, 12),
+            checkInDate: new DateOnly(2025, 1, 10), // Arrives Jan 10
+            checkOutDate: new DateOnly(2025, 1, 12), // Leaves Jan 12
             roomId: room.Id,
             numberOfGuests: 1);
 
         // Assert
-        Assert.IsType<CreateBookingResult.RoomNoLongerAvailable>(result);
+        Assert.IsType<CreateBookingResult.Success>(result);
     }
 
     [Fact]
     public async Task CreateBooking_BackToBackBookings_ReturnsSuccess()
     {
-        // Guest A checks out Jan 10 (EndDate=9), Guest B checks in Jan 10 (StartDate=10)
+        // Guest A leaves Jan 10, Guest B arrives Jan 10 (no overlap)
         // Arrange
         await using var dbContext = DbContextFactory.Create();
         var hotel = new Hotel { Name = "Test Hotel" };
         var room = new HotelRoom { RoomNumber = 1, RoomType = HotelRoomType.Single, Capacity = 1 };
         room.Bookings.Add(new Booking
         {
-            StartDate = new DateOnly(2025, 1, 5),
-            EndDate = new DateOnly(2025, 1, 9), // Last night Jan 9, checkout morning of Jan 10
+            CheckInDate = new DateOnly(2025, 1, 5),
+            CheckOutDate = new DateOnly(2025, 1, 10), // Staying nights Jan 5-9 (leave morning of 10th)
             NoOfGuests = 1
         });
         hotel.Rooms.Add(room);
@@ -218,8 +218,8 @@ public class BookingServiceTests
 
         // Act
         var result = await service.CreateBooking(
-            startDate: new DateOnly(2025, 1, 10), // Check in Jan 10
-            endDate: new DateOnly(2025, 1, 12),
+            checkInDate: new DateOnly(2025, 1, 10), // Arrives Jan 10
+            checkOutDate: new DateOnly(2025, 1, 12), // Leaves Jan 12
             roomId: room.Id,
             numberOfGuests: 1);
 
@@ -236,8 +236,8 @@ public class BookingServiceTests
         var room = new HotelRoom { RoomNumber = 1, RoomType = HotelRoomType.Single, Capacity = 1 };
         room.Bookings.Add(new Booking
         {
-            StartDate = new DateOnly(2025, 1, 8),
-            EndDate = new DateOnly(2025, 1, 11),
+            CheckInDate = new DateOnly(2025, 1, 8),
+            CheckOutDate = new DateOnly(2025, 1, 11),
             NoOfGuests = 1
         });
         hotel.Rooms.Add(room);
@@ -248,8 +248,8 @@ public class BookingServiceTests
 
         // Act
         var result = await service.CreateBooking(
-            startDate: new DateOnly(2025, 1, 10),
-            endDate: new DateOnly(2025, 1, 14),
+            checkInDate: new DateOnly(2025, 1, 10),
+            checkOutDate: new DateOnly(2025, 1, 14),
             roomId: room.Id,
             numberOfGuests: 1);
 
@@ -266,8 +266,8 @@ public class BookingServiceTests
         var room = new HotelRoom { RoomNumber = 1, RoomType = HotelRoomType.Single, Capacity = 1 };
         room.Bookings.Add(new Booking
         {
-            StartDate = new DateOnly(2025, 1, 13),
-            EndDate = new DateOnly(2025, 1, 17),
+            CheckInDate = new DateOnly(2025, 1, 13),
+            CheckOutDate = new DateOnly(2025, 1, 17),
             NoOfGuests = 1
         });
         hotel.Rooms.Add(room);
@@ -278,8 +278,8 @@ public class BookingServiceTests
 
         // Act
         var result = await service.CreateBooking(
-            startDate: new DateOnly(2025, 1, 10),
-            endDate: new DateOnly(2025, 1, 14),
+            checkInDate: new DateOnly(2025, 1, 10),
+            checkOutDate: new DateOnly(2025, 1, 14),
             roomId: room.Id,
             numberOfGuests: 1);
 
@@ -299,19 +299,19 @@ public class BookingServiceTests
         await dbContext.SaveChangesAsync();
 
         var service = new BookingService(dbContext);
-        var startDate = new DateOnly(2025, 1, 10);
-        var endDate = new DateOnly(2025, 1, 12);
+        var checkInDate = new DateOnly(2025, 1, 10);
+        var checkOutDate = new DateOnly(2025, 1, 12);
         var numberOfGuests = 2;
 
         // Act
-        var result = await service.CreateBooking(startDate, endDate, room.Id, numberOfGuests);
+        var result = await service.CreateBooking(checkInDate, checkOutDate, room.Id, numberOfGuests);
 
         // Assert
         var success = Assert.IsType<CreateBookingResult.Success>(result);
         var booking = await dbContext.Bookings.FindAsync(success.BookingId);
         Assert.NotNull(booking);
-        Assert.Equal(startDate, booking.StartDate);
-        Assert.Equal(endDate, booking.EndDate);
+        Assert.Equal(checkInDate, booking.CheckInDate);
+        Assert.Equal(checkOutDate, booking.CheckOutDate);
         Assert.Equal(room.Id, booking.HotelRoomId);
         Assert.Equal(numberOfGuests, booking.NoOfGuests);
     }
@@ -331,8 +331,8 @@ public class BookingServiceTests
 
         // Act
         var result = await service.CreateBooking(
-            startDate: new DateOnly(2025, 1, 10),
-            endDate: new DateOnly(2025, 1, 12),
+            checkInDate: new DateOnly(2025, 1, 10),
+            checkOutDate: new DateOnly(2025, 1, 12),
             roomId: room.Id,
             numberOfGuests: 2); // Exactly at capacity
 
@@ -350,8 +350,8 @@ public class BookingServiceTests
         var room2 = new HotelRoom { RoomNumber = 2, RoomType = HotelRoomType.Single, Capacity = 1 };
         room1.Bookings.Add(new Booking
         {
-            StartDate = new DateOnly(2025, 1, 10),
-            EndDate = new DateOnly(2025, 1, 12),
+            CheckInDate = new DateOnly(2025, 1, 10),
+            CheckOutDate = new DateOnly(2025, 1, 12),
             NoOfGuests = 1
         });
         hotel.Rooms.Add(room1);
@@ -363,8 +363,8 @@ public class BookingServiceTests
 
         // Act - book room2 for the same dates that room1 is booked
         var result = await service.CreateBooking(
-            startDate: new DateOnly(2025, 1, 10),
-            endDate: new DateOnly(2025, 1, 12),
+            checkInDate: new DateOnly(2025, 1, 10),
+            checkOutDate: new DateOnly(2025, 1, 12),
             roomId: room2.Id,
             numberOfGuests: 1);
 
@@ -383,8 +383,8 @@ public class BookingServiceTests
 
         var booking = new Booking
         {
-            StartDate = new DateOnly(2025, 1, 10),
-            EndDate = new DateOnly(2025, 1, 12),
+            CheckInDate = new DateOnly(2025, 1, 10),
+            CheckOutDate = new DateOnly(2025, 1, 12),
             NoOfGuests = 2
         };
         room.Bookings.Add(booking);
@@ -400,8 +400,8 @@ public class BookingServiceTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(booking.Id, result.Id);
-        Assert.Equal(new DateOnly(2025, 1, 10), result.StartDate);
-        Assert.Equal(new DateOnly(2025, 1, 12), result.EndDate);
+        Assert.Equal(new DateOnly(2025, 1, 10), result.CheckInDate);
+        Assert.Equal(new DateOnly(2025, 1, 12), result.CheckOutDate);
         Assert.Equal(2, result.NoOfGuests);
         Assert.Equal(room.Id, result.HotelRoomId);
     }
@@ -431,8 +431,8 @@ public class BookingServiceTests
 
         var booking = new Booking
         {
-            StartDate = new DateOnly(2025, 1, 10),
-            EndDate = new DateOnly(2025, 1, 12),
+            CheckInDate = new DateOnly(2025, 1, 10),
+            CheckOutDate = new DateOnly(2025, 1, 12),
             NoOfGuests = 2
         };
         room.Bookings.Add(booking);
@@ -464,8 +464,8 @@ public class BookingServiceTests
 
         var booking = new Booking
         {
-            StartDate = new DateOnly(2025, 1, 10),
-            EndDate = new DateOnly(2025, 1, 12),
+            CheckInDate = new DateOnly(2025, 1, 10),
+            CheckOutDate = new DateOnly(2025, 1, 12),
             NoOfGuests = 2
         };
         room.Bookings.Add(booking);
@@ -498,16 +498,16 @@ public class BookingServiceTests
 
         var booking1 = new Booking
         {
-            StartDate = new DateOnly(2025, 1, 10),
-            EndDate = new DateOnly(2025, 1, 12),
+            CheckInDate = new DateOnly(2025, 1, 10),
+            CheckOutDate = new DateOnly(2025, 1, 12),
             NoOfGuests = 1
         };
         room1.Bookings.Add(booking1);
 
         var booking2 = new Booking
         {
-            StartDate = new DateOnly(2025, 1, 15),
-            EndDate = new DateOnly(2025, 1, 17),
+            CheckInDate = new DateOnly(2025, 1, 15),
+            CheckOutDate = new DateOnly(2025, 1, 17),
             NoOfGuests = 2
         };
         room2.Bookings.Add(booking2);
@@ -523,8 +523,8 @@ public class BookingServiceTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(booking2.Id, result.Id);
-        Assert.Equal(new DateOnly(2025, 1, 15), result.StartDate);
-        Assert.Equal(new DateOnly(2025, 1, 17), result.EndDate);
+        Assert.Equal(new DateOnly(2025, 1, 15), result.CheckInDate);
+        Assert.Equal(new DateOnly(2025, 1, 17), result.CheckOutDate);
         Assert.Equal(2, result.NoOfGuests);
         Assert.Equal(102, result.Room!.RoomNumber);
     }
