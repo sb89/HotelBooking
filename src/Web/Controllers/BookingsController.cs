@@ -38,7 +38,7 @@ namespace Web.Controllers
             );
         }
 
-        [HttpGet("api/v1/{bookingReference:int}")]
+        [HttpGet("{bookingReference:int}")]
         public async Task<IActionResult> Get(int bookingReference)
         {
             var booking = await bookingsService.Get(bookingReference);
