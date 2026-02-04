@@ -87,10 +87,15 @@ try
     {
         app.MapOpenApi();
     }
-
-    app.UseHttpsRedirection();
-
+    
     app.MapControllers();
+    
+    if (app.Environment.IsProduction())
+    {
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        db.Database.Migrate();
+    }
 
     app.Run();
 }

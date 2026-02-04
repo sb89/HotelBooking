@@ -47,4 +47,6 @@ msbuild.wrn
 # Node.js build artifacts
 node_modules/
 package-lock.json
-package.json
+package.json.env
+
+appsettings.Production.json
