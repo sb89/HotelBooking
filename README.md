@@ -42,7 +42,7 @@ There is a dockerfile and docker-compose file that can be used to run using dock
 
 ### Hosting
 
-I've hosted the application on my VPS which can be accessed here. This was achieved using docker compose and nginx. The same approach would have been taken on an Azure VM.
+I've hosted the application on my VPS which can be accessed at http://162.55.54.238:8080/ e.g. http://162.55.54.238:8080/api/v1/hotels. This was achieved using docker compose and nginx. The same approach would have been taken on an Azure VM.
 
 ### Improvements
 - Github action at the moment just builds and ensures tests pass. This would be improved to add automatic deployment.
