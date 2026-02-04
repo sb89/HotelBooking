@@ -1,0 +1,32 @@
+using Infrastructure.Data;
+using Infrastructure.Interfaces.Services;
+using Infrastructure.Models;
+using Infrastructure.Results.HotelRooms;
+using Microsoft.EntityFrameworkCore;
+
+namespace Infrastructure.Services;
+
+public class HotelRoomsService(ApplicationDbContext dbContext) : IHotelRoomsService
+{
+    public async Task<SearchAvailableResult> SearchAvailable(SearchAvailableCriteria criteria)
+    {
+        var hotel = await dbContext.Hotels.FindAsync(criteria.HotelId);
+        if (hotel == null)
+        {
+            return new SearchAvailableResult.HotelNotFound();
+        }
+        
+        var availableRooms = await dbContext.HotelRooms
+            .Where(r => r.HotelId == criteria.HotelId)
+            .Where(r => !r.Bookings.Any(b =>
+                b.StartDate <= criteria.EndDate && b.EndDate >= criteria.StartDate))
+            .ToListAsync();
+        
+        var totalCapacity = availableRooms.Sum(r => r.Capacity);
+
+        if (totalCapacity < criteria.NumberOfGuests)
+            return new SearchAvailableResult.Success([]);
+        
+        return new SearchAvailableResult.Success(availableRooms);
+    }
+}
