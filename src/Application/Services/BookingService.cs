@@ -33,8 +33,9 @@ public class BookingService(ApplicationDbContext dbContext, ILogger<BookingServi
             return new CreateBookingResult.CapacityExceeded();
         }
         
-        // This locking mechanism will only work if a single instance of the api is running, consider alternatives (ie SQL Locking)
-        // if scaling required
+        // This locking mechanism will only work if a single instance of the api is running and CreateBookingLock will
+        // eventually fill up over time which shouldn't be a problem for this project,
+        // consider alternatives (ie SQL Locking) if scaling required
         var roomLock = CreateBookingLock.GetOrAdd(roomId, _ => new SemaphoreSlim(1, 1));
 
         await roomLock.WaitAsync(cancellationToken);
