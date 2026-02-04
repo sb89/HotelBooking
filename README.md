@@ -8,10 +8,10 @@ Run the following commands from the `root` directory.
 `dotnet ef migrations add MigrationName --project src/Application --startup-project src/Web --output-dir Data/Migrations`
 
 ### Rollback to previous migration
-`dotnet ef database update PreviousMigrationName --project src/Infrastructure --startup-project src/Web`
+`dotnet ef database update PreviousMigrationName --project src/Application --startup-project src/Web`
 
 ### Remove
-`dotnet ef migrations remove --project src/Infrastructure --startup-project src/Web`
+`dotnet ef migrations remove --project src/Application --startup-project src/Web`
 
 ### Run
 `dotnet ef database update --project src/Application --startup-project src/Web`
