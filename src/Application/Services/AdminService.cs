@@ -2,13 +2,16 @@ using Domain.Entities;
 using Infrastructure.Data;
 using Infrastructure.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Services;
 
-public class AdminService(ApplicationDbContext dbContext) : IAdminService
+public class AdminService(ApplicationDbContext dbContext, ILogger<AdminService> logger) : IAdminService
 {
     public Task Seed(CancellationToken cancellationToken = default)
     {
+        logger.LogInformation("Seeding database");
+        
         var hotel1 = new Hotel { Name = "Hotel 1" };
         hotel1.Rooms =
         [
@@ -51,6 +54,8 @@ public class AdminService(ApplicationDbContext dbContext) : IAdminService
 
     public async Task Reset(CancellationToken cancellationToken = default)
     {
+        logger.LogInformation("Resetting database");
+        
         await dbContext.Hotels.ExecuteDeleteAsync(cancellationToken);
         
         await dbContext.SaveChangesAsync(cancellationToken);

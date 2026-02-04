@@ -2,6 +2,7 @@ using ApplicationTests.Factories;
 using Domain.Entities;
 using Infrastructure.Results.Bookings;
 using Infrastructure.Services;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ApplicationTests.ServiceTests;
 
@@ -12,7 +13,7 @@ public class BookingServiceTests
     {
         // Arrange
         await using var dbContext = DbContextFactory.Create();
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act
         var result = await service.CreateBooking(
@@ -36,7 +37,7 @@ public class BookingServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act
         var result = await service.CreateBooking(
@@ -60,7 +61,7 @@ public class BookingServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act
         var result = await service.CreateBooking(
@@ -91,7 +92,7 @@ public class BookingServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act
         var result = await service.CreateBooking(
@@ -121,7 +122,7 @@ public class BookingServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act
         var result = await service.CreateBooking(
@@ -152,7 +153,7 @@ public class BookingServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act
         var result = await service.CreateBooking(
@@ -183,7 +184,7 @@ public class BookingServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act
         var result = await service.CreateBooking(
@@ -214,7 +215,7 @@ public class BookingServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act
         var result = await service.CreateBooking(
@@ -244,7 +245,7 @@ public class BookingServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act
         var result = await service.CreateBooking(
@@ -274,7 +275,7 @@ public class BookingServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act
         var result = await service.CreateBooking(
@@ -298,7 +299,7 @@ public class BookingServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
         var checkInDate = new DateOnly(2025, 1, 10);
         var checkOutDate = new DateOnly(2025, 1, 12);
         var numberOfGuests = 2;
@@ -327,7 +328,7 @@ public class BookingServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act
         var result = await service.CreateBooking(
@@ -359,7 +360,7 @@ public class BookingServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act - book room2 for the same dates that room1 is booked
         var result = await service.CreateBooking(
@@ -392,7 +393,7 @@ public class BookingServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act
         var result = await service.Get(booking.Id);
@@ -411,7 +412,7 @@ public class BookingServiceTests
     {
         // Arrange
         await using var dbContext = DbContextFactory.Create();
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act
         var result = await service.Get(999);
@@ -440,7 +441,7 @@ public class BookingServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act
         var result = await service.Get(booking.Id);
@@ -473,7 +474,7 @@ public class BookingServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act
         var result = await service.Get(booking.Id);
@@ -515,7 +516,7 @@ public class BookingServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new BookingService(dbContext);
+        var service = new BookingService(dbContext, NullLogger<BookingService>.Instance);
 
         // Act
         var result = await service.Get(booking2.Id);

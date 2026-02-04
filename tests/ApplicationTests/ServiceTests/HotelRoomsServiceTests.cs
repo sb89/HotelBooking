@@ -3,6 +3,7 @@ using Domain.Entities;
 using Infrastructure.Models;
 using Infrastructure.Results.HotelRooms;
 using Infrastructure.Services;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ApplicationTests.ServiceTests;
 
@@ -13,7 +14,7 @@ public class HotelRoomsServiceTests
     {
         // Arrange
         await using var dbContext = DbContextFactory.Create();
-        var service = new HotelRoomsService(dbContext);
+        var service = new HotelRoomsService(dbContext, NullLogger<HotelRoomsService>.Instance);
         var criteria = new SearchAvailableCriteria
         {
             HotelId = 999,
@@ -43,7 +44,7 @@ public class HotelRoomsServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new HotelRoomsService(dbContext);
+        var service = new HotelRoomsService(dbContext, NullLogger<HotelRoomsService>.Instance);
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
@@ -77,7 +78,7 @@ public class HotelRoomsServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new HotelRoomsService(dbContext);
+        var service = new HotelRoomsService(dbContext, NullLogger<HotelRoomsService>.Instance);
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
@@ -111,7 +112,7 @@ public class HotelRoomsServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new HotelRoomsService(dbContext);
+        var service = new HotelRoomsService(dbContext, NullLogger<HotelRoomsService>.Instance);
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
@@ -146,7 +147,7 @@ public class HotelRoomsServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new HotelRoomsService(dbContext);
+        var service = new HotelRoomsService(dbContext, NullLogger<HotelRoomsService>.Instance);
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
@@ -181,7 +182,7 @@ public class HotelRoomsServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new HotelRoomsService(dbContext);
+        var service = new HotelRoomsService(dbContext, NullLogger<HotelRoomsService>.Instance);
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
@@ -216,7 +217,7 @@ public class HotelRoomsServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new HotelRoomsService(dbContext);
+        var service = new HotelRoomsService(dbContext, NullLogger<HotelRoomsService>.Instance);
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
@@ -247,7 +248,7 @@ public class HotelRoomsServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new HotelRoomsService(dbContext);
+        var service = new HotelRoomsService(dbContext, NullLogger<HotelRoomsService>.Instance);
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
@@ -278,7 +279,7 @@ public class HotelRoomsServiceTests
         dbContext.Hotels.AddRange(hotel1, hotel2);
         await dbContext.SaveChangesAsync();
 
-        var service = new HotelRoomsService(dbContext);
+        var service = new HotelRoomsService(dbContext, NullLogger<HotelRoomsService>.Instance);
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel1.Id,
@@ -314,7 +315,7 @@ public class HotelRoomsServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new HotelRoomsService(dbContext);
+        var service = new HotelRoomsService(dbContext, NullLogger<HotelRoomsService>.Instance);
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,
@@ -349,7 +350,7 @@ public class HotelRoomsServiceTests
         dbContext.Hotels.Add(hotel);
         await dbContext.SaveChangesAsync();
 
-        var service = new HotelRoomsService(dbContext);
+        var service = new HotelRoomsService(dbContext, NullLogger<HotelRoomsService>.Instance);
         var criteria = new SearchAvailableCriteria
         {
             HotelId = hotel.Id,

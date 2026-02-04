@@ -1,6 +1,7 @@
 using ApplicationTests.Factories;
 using Domain.Entities;
 using Infrastructure.Services;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ApplicationTests.ServiceTests;
 
@@ -17,7 +18,7 @@ public class HotelServiceTests
         );
         await dbContext.SaveChangesAsync();
 
-        var service = new HotelService(dbContext);
+        var service = new HotelService(dbContext, NullLogger<HotelService>.Instance);
 
         // Act
         var result = await service.Search();
@@ -38,7 +39,7 @@ public class HotelServiceTests
         );
         await dbContext.SaveChangesAsync();
 
-        var service = new HotelService(dbContext);
+        var service = new HotelService(dbContext, NullLogger<HotelService>.Instance);
 
         // Act
         var result = await service.Search("Hilton");
@@ -56,7 +57,7 @@ public class HotelServiceTests
         dbContext.Hotels.Add(new Hotel { Name = "Hilton" });
         await dbContext.SaveChangesAsync();
 
-        var service = new HotelService(dbContext);
+        var service = new HotelService(dbContext, NullLogger<HotelService>.Instance);
 
         // Act
         var result = await service.Search("NonExistent");
