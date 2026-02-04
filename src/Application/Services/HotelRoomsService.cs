@@ -25,6 +25,7 @@ public class HotelRoomsService(ApplicationDbContext dbContext, ILogger<HotelRoom
             .Where(r => r.HotelId == criteria.HotelId)
             .Where(r => !r.Bookings.Any(b =>
                 b.CheckInDate < criteria.CheckoutDate && b.CheckOutDate > criteria.CheckInDate))
+            .OrderBy(r => r.RoomNumber)
             .ToListAsync(cancellationToken);
         
         var totalCapacity = availableRooms.Sum(r => r.Capacity);

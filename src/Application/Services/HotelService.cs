@@ -20,6 +20,8 @@ public class HotelService(ApplicationDbContext dbContext, ILogger<HotelService> 
         {
             query = query.Where(h => h.Name.Contains(name));
         }
+        
+        query = query.OrderBy(h => h.Name);
 
         return query.ToListAsync(cancellationToken);
     }
