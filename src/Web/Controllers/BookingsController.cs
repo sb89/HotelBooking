@@ -10,7 +10,23 @@ namespace Web.Controllers
     [ApiController]
     public class BookingsController(IBookingsService bookingsService) : ControllerBase
     {
+        /// <summary>
+        /// Create a new booking for a hotel room
+        /// </summary>
+        /// <param name="request">Booking details including room ID, dates, and number of guests</param>
+        /// <param name="validator">Validator injected by framework</param>
+        /// <returns>Booking reference number</returns>
+        /// <response code="201">Booking created successfully</response>
+        /// <response code="400">Invalid request (e.g., past dates, invalid guest count)</response>
+        /// <response code="404">Room not found</response>
+        /// <response code="409">Room already booked for selected dates</response>
+        /// <response code="422">Number of guests exceeds room capacity</response>
         [HttpPost]
+        [ProducesResponseType(typeof(object), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
         public async Task<IActionResult> Create([FromBody] CreateBookingRequest request,
             IValidator<CreateBookingRequest> validator)
         {
@@ -38,7 +54,16 @@ namespace Web.Controllers
             );
         }
 
+        /// <summary>
+        /// Get booking details by reference number
+        /// </summary>
+        /// <param name="bookingReference">The unique booking reference ID</param>
+        /// <returns>Booking details including hotel name, room number, dates, and guest count</returns>
+        /// <response code="200">Booking found and returned</response>
+        /// <response code="404">Booking not found</response>
         [HttpGet("{bookingReference:int}")]
+        [ProducesResponseType(typeof(GetBookingResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(int bookingReference)
         {
             var booking = await bookingsService.Get(bookingReference);

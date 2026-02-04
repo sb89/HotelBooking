@@ -21,7 +21,16 @@ try
 {
     // Add services to the container.
     // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-    builder.Services.AddOpenApi();
+    builder.Services.AddOpenApi(options =>
+    {
+        options.AddDocumentTransformer((document, context, cancellationToken) =>
+        {
+            document.Info.Title = "Hotel Booking API";
+            document.Info.Version = "v1";
+            document.Info.Description = "A RESTful API for managing hotel room bookings";
+            return Task.CompletedTask;
+        });
+    });
 
     builder.Services.AddProblemDetails();
 

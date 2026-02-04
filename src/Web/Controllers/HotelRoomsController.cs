@@ -11,7 +11,20 @@ namespace Web.Controllers
     [ApiController]
     public class HotelRoomsController(IHotelRoomsService hotelRoomsService) : ControllerBase
     {
+        /// <summary>
+        /// Find available rooms for a hotel within a date range
+        /// </summary>
+        /// <param name="hotelId">The hotel ID</param>
+        /// <param name="request">Search criteria including check-in/out dates and number of guests</param>
+        /// <param name="validator">Validator injected by framework</param>
+        /// <returns>List of available rooms matching the criteria</returns>
+        /// <response code="200">Available rooms found (may be empty list)</response>
+        /// <response code="400">Invalid request (e.g., past dates, invalid guest count)</response>
+        /// <response code="404">Hotel not found</response>
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<SearchAvailableResult>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> SearchAvailable(int hotelId, [FromQuery]SearchAvailableRequest request,
             IValidator<SearchAvailableRequest> validator)
         {
