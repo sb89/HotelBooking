@@ -35,8 +35,8 @@ There is a dockerfile and docker-compose file that can be used to run using dock
 
 ### Assumptions
 
-- Room type implies room capacity: Single (1), Double (2), Deluxe (4)
-- Hotel names not unique, an address field could be added to distinguish between hotels with the same name
+- Room type implies room capacity: Single (1), Double (2), Deluxe (4).
+- Hotel are names not unique, an address field could be added to distinguish between hotels with the same name.
 - The search availability functionality will return multiple rooms (if possible) to meet the number of guests requirement.
 - Although the search availabilty function returns multiple of rooms, the create booking endpoint will only allow a single room to be booked at a time. This could be changed to allow multiple rooms to be booked at the same time.
 
