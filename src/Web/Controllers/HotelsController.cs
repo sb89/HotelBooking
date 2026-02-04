@@ -4,7 +4,7 @@ using Web.DTOs.Hotels;
 
 namespace Web.Controllers
 {
-    [Route("api/hotels")]
+    [Route("api/v1/hotels")]
     [ApiController]
     public class HotelsController(IHotelService hotelService) : ControllerBase
     {

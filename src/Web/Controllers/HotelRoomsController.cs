@@ -7,7 +7,7 @@ using Web.Extensions;
 
 namespace Web.Controllers
 {
-    [Route("api/hotels/{hotelId:int}/rooms")]
+    [Route("api/v1/hotels/{hotelId:int}/rooms")]
     [ApiController]
     public class HotelRoomsController(IHotelRoomsService hotelRoomsService) : ControllerBase
     {

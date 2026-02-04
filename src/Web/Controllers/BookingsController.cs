@@ -6,7 +6,7 @@ using Web.Extensions;
 
 namespace Web.Controllers
 {
-    [Route("api/bookings")]
+    [Route("api/v1/bookings")]
     [ApiController]
     public class BookingsController(IBookingsService bookingsService) : ControllerBase
     {
@@ -38,7 +38,7 @@ namespace Web.Controllers
             );
         }
 
-        [HttpGet("{bookingReference:int}")]
+        [HttpGet("api/v1/{bookingReference:int}")]
         public async Task<IActionResult> Get(int bookingReference)
         {
             var booking = await bookingsService.Get(bookingReference);
