@@ -92,10 +92,10 @@ try
     app.UseSerilogRequestLogging();
 
     // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
-    {
+    //if (app.Environment.IsDevelopment())
+    //{
         app.MapOpenApi();
-    }
+    //}
     
     app.MapControllers();
     
